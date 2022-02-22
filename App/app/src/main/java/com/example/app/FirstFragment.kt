@@ -1,8 +1,8 @@
 package com.example.app
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.app.databinding.FragmentFirstBinding
 
