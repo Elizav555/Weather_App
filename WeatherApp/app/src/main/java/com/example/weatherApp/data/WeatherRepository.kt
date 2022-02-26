@@ -12,6 +12,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 private const val API_KEY = "aa36cfdd9ceba87b783295438fe008a6"
 private const val QUERY_API_KEY = "appid"
+private const val UNITS = "metric"
+private const val QUERY_UNITS = "units"
 
 class WeatherRepository {
 
@@ -28,9 +30,23 @@ class WeatherRepository {
         )
     }
 
+    private val metricsInterceptor = Interceptor { chain ->
+        val original = chain.request()
+        val newURL = original.url.newBuilder()
+            .addQueryParameter(QUERY_UNITS, UNITS)
+            .build()
+
+        chain.proceed(
+            original.newBuilder()
+                .url(newURL)
+                .build()
+        )
+    }
+
     private val okhttp: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(metricsInterceptor)
             .also {
                 if (BuildConfig.DEBUG) {
                     it.addInterceptor(
@@ -51,8 +67,18 @@ class WeatherRepository {
             .create(WeatherApi::class.java)
     }
 
-    suspend fun getWeather(city: String): City = api.getWeather(city)
+    suspend fun getWeather(cityName: String): City = api.getWeather(cityName)
+
+    /*suspend fun getWeather(cityName: String): City? {
+            return try {
+            api.getWeather(cityName)
+            } catch (e: Exception) {
+                return null
+            }
+        }*/
 
     suspend fun getWeatherNearLocation(coordinates: Coord): List<City> =
         api.getWeatherNearLocation(coordinates.lat.toString(), coordinates.lon.toString()).list
+
+    suspend fun getWeather(cityId: Int): City = api.getWeather(cityId)
 }

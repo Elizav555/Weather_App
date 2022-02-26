@@ -6,10 +6,13 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherApi {
-    @GET("weather?units=metric&lang=EN")
+    @GET("weather?")
     suspend fun getWeather(@Query("q") city: String): City
 
-    @GET("find?lat=57&lon=-2.15&cnt=10")
+    @GET("weather?")
+    suspend fun getWeather(@Query("id") cityId: Int): City
+
+    @GET("find?cnt=10")
     suspend fun getWeatherNearLocation(
         @Query("lat") latitude: String,
         @Query("lon") longitude: String,

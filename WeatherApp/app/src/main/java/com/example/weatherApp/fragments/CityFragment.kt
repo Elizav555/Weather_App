@@ -5,13 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.api.load
 import com.example.weatherApp.R
 import com.example.weatherApp.data.WeatherRepository
 import com.example.weatherApp.databinding.FragmentCityBinding
-import kotlinx.coroutines.MainScope
+import com.example.weatherApp.utils.ColorManager
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
@@ -28,15 +30,19 @@ class CityFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MainScope().launch {
-            val city = WeatherRepository().getWeather(args.cityName)
+        // show loading
+        lifecycleScope.launch {
+            val city = WeatherRepository().getWeather(args.cityId)
             with(binding) {
+                curtempTv.setTextColor(ColorManager().chooseTempColor(city.main.temp))
+                curtempTv.text = getString(R.string.temp, city.main.temp.roundToInt())
                 cityNameTv.text = city.name
-                curtempTv.text = city.main.temp.toString()
-                weatherIv.load(getString(R.string.weather_icon, city.weather[0].icon))
+                val iconUrl = getString(R.string.weather_icon, city.weather[0].icon)
+                weatherIv.load(iconUrl)
                 descTv.text = city.weather[0].description
                 windTv.text = city.wind.deg.toString() // need to convert degrees to direction
-                feelsLikeTv.text = city.main.feels_like.toString()
+                feelsLikeTv.setTextColor(ColorManager().chooseTempColor(city.main.feels_like))
+                feelsLikeTv.text = getString(R.string.feels_temp, city.main.feels_like.roundToInt())
                 humidityTv.text = city.main.humidity.toString()
                 pressureTv.text = city.main.pressure.toString()
             }
