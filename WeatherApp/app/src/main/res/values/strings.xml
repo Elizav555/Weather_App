@@ -2,7 +2,10 @@
     <string name="app_name">Weather App</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="temp"> Temp: %1$d <b>°C</b></string>
-    <string name="feels_temp"> Feels Like: %1$d <b>°C</b></string>
-    <string name="weather_icon"> http://openweathermap.org/img/wn/%1$s@2x.png</string>
+    <string name="temp">Temp: %1$d <b>°C</b></string>
+    <string name="feels_temp">Feels Like: %1$d <b>°C</b></string>
+    <string name="wind">Wind direction: <b>%1$s</b>, speed: %2$s m/s </string>
+    <string name="humidity">Humidity: %1$d<b>%%</b> </string>
+    <string name="pressure">Pressure: %1$d hPa</string>
+    <string name="weather_icon">http://openweathermap.org/img/wn/%1$s@2x.png</string>
 </resources>

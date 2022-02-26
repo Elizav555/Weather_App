@@ -45,6 +45,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configureSearch()
+        binding.progressBar.visibility = View.VISIBLE
         checkLocationPermission()
     }
 
@@ -125,22 +126,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     )
                 }
                 getCitiesForList(defaultCoord)
-
             }.addOnFailureListener {
                 getCitiesForList(defaultCoord)
             }
     }
 
     private fun getCitiesForList(coord: Coord) {
-        // show loading
         runBlocking {
             cities = WeatherRepository().getWeatherNearLocation(coord)
+            init()
+            binding.progressBar.visibility = View.GONE
         }
-        init()
     }
 
     private fun getCity(cityName: String): Boolean {
-        // show loading
         var city: City?
         try {
             runBlocking {
