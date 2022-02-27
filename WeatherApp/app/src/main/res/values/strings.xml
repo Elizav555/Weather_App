@@ -7,5 +7,5 @@
     <string name="wind">Wind direction: <b>%1$s</b>, speed: %2$s m/s </string>
     <string name="humidity">Humidity: %1$d<b>%%</b> </string>
     <string name="pressure">Pressure: %1$d hPa</string>
-    <string name="weather_icon">http://openweathermap.org/img/wn/%1$s@2x.png</string>
+    <string name="weather_icon">https://openweathermap.org/img/wn/%1$s@2x.png</string>
 </resources>
