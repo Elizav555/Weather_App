@@ -1,4 +1,4 @@
-package com.example.weatherApp.utils
+package com.example.weatherApp.presentation
 
 import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment

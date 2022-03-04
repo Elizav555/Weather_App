@@ -1,13 +1,12 @@
-package com.example.weatherApp.city
+package com.example.weatherApp.presentation.city
 
 import android.content.Context
 import android.content.res.Resources
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherApp.R
-import com.example.weatherApp.data.response.City
 import com.example.weatherApp.databinding.ItemCityBinding
-import com.example.weatherApp.utils.ColorManager
-import kotlin.math.roundToInt
+import com.example.weatherApp.domain.entities.CityWeather
+import com.example.weatherApp.domain.utils.ColorManager
 
 class CityHolder(
     private val binding: ItemCityBinding,
@@ -21,12 +20,12 @@ class CityHolder(
         }
     }
 
-    fun bind(city: City) {
+    fun bind(city: CityWeather) {
         with(binding) {
             val res: Resources = context.resources
-            val color = ColorManager().chooseTempColor(city.main.temp, context)
+            val color = ColorManager().chooseTempColor(city.temp, context)
             tempTv.setTextColor(color)
-            tempTv.text = res.getString(R.string.temp, city.main.temp.roundToInt())
+            tempTv.text = res.getString(R.string.temp, city.temp)
             cityTv.text = city.name
         }
     }

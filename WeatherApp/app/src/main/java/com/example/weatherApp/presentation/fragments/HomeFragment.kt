@@ -1,4 +1,4 @@
-package com.example.weatherApp.fragments
+package com.example.weatherApp.presentation.fragments
 
 import android.Manifest
 import android.app.AlertDialog
@@ -16,14 +16,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherApp.R
-import com.example.weatherApp.city.CityAdapter
-import com.example.weatherApp.data.WeatherRepository
-import com.example.weatherApp.data.response.City
-import com.example.weatherApp.data.response.Coord
+import com.example.weatherApp.data.WeatherRepositoryImpl
+import com.example.weatherApp.data.mapper.CityMapper
 import com.example.weatherApp.databinding.FragmentHomeBinding
-import com.example.weatherApp.utils.autoCleared
+import com.example.weatherApp.di.DIContainer
+import com.example.weatherApp.domain.entities.CityWeather
+import com.example.weatherApp.domain.entities.Coordinates
+import com.example.weatherApp.domain.usecase.GetWeatherNearUseCase
+import com.example.weatherApp.domain.usecase.GetWeatherUseCase
+import com.example.weatherApp.presentation.autoCleared
+import com.example.weatherApp.presentation.city.CityAdapter
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -31,8 +36,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var binding: FragmentHomeBinding
     private var rationaleDialog: AlertDialog? = null
     private var cityAdapter: CityAdapter by autoCleared()
-    private var cities = listOf<City>()
-    private val defaultCoord = Coord(35.652832, 139.839478)
+    private var cities = listOf<CityWeather>()
+    private val defaultCoordinates = Coordinates("35.652832", "139.839478")
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -40,16 +45,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             if (isGranted) {
                 getLocation()
             } else {
-                getCitiesForList(defaultCoord)
+                getCitiesForList(defaultCoordinates)
                 showSnackbar("No location access, set default")
             }
         }
+    private lateinit var getWeatherUseCase: GetWeatherUseCase
+    private lateinit var getWeatherNearUseCase: GetWeatherNearUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        initObjects()
         binding = FragmentHomeBinding.inflate(inflater)
         return binding.root
     }
@@ -111,7 +119,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         cityAdapter.submitList(cities)
     }
 
-    private fun navigateToCity(city: City) {
+    private fun navigateToCity(city: CityWeather) {
         val action = HomeFragmentDirections.actionHomeFragmentToCityFragment(city.id)
         findNavController().navigate(action)
     }
@@ -129,22 +137,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .lastLocation.addOnCompleteListener {
                     if (it.result != null) {
                         getCitiesForList(
-                            Coord(
-                                it.result.latitude,
-                                it.result.longitude
+                            Coordinates(
+                                it.result.latitude.toString(),
+                                it.result.longitude.toString()
                             )
                         )
                     } else {
-                        getCitiesForList(defaultCoord)
+                        getCitiesForList(defaultCoordinates)
                         showSnackbar("Error while getting your location, set default")
                     }
                 }
         }
     }
 
-    private fun getCitiesForList(coord: Coord) {
+    private fun getCitiesForList(coordinates: Coordinates) {
         lifecycleScope.launch {
-            cities = WeatherRepository().getWeatherNearLocation(coord)
+            cities = getWeatherNearUseCase(coordinates)
             init()
             binding.progressBar.visibility = View.GONE
         }
@@ -153,7 +161,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun getCity(cityName: String) {
         lifecycleScope.launch {
             try {
-                val city = WeatherRepository().getWeather(cityName)
+                val city = getWeatherUseCase(cityName)
                 navigateToCity(city)
             } catch (exc: HttpException) {
                 showSnackbar("Invalid city")
@@ -179,6 +187,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 return false
             }
         })
+    }
+
+    private fun initObjects() {
+        getWeatherUseCase = GetWeatherUseCase(
+            weatherRepository = WeatherRepositoryImpl(
+                api = DIContainer().api,
+                cityMapper = CityMapper(),
+            ),
+            dispatcher = Dispatchers.Default
+        )
+
+        getWeatherNearUseCase = GetWeatherNearUseCase(
+            weatherRepository = WeatherRepositoryImpl(
+                api = DIContainer().api,
+                cityMapper = CityMapper(),
+            ),
+            dispatcher = Dispatchers.Default
+        )
     }
 
     private fun showSnackbar(text: String) = Snackbar.make(

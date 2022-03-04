@@ -1,8 +1,7 @@
-package com.example.weatherApp.data
+package com.example.weatherApp.di
 
 import androidx.viewbinding.BuildConfig
-import com.example.weatherApp.data.response.City
-import com.example.weatherApp.data.response.Coord
+import com.example.weatherApp.data.WeatherApi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,8 +14,7 @@ private const val QUERY_API_KEY = "appid"
 private const val UNITS = "metric"
 private const val QUERY_UNITS = "units"
 
-class WeatherRepository {
-
+class DIContainer {
     private val apiKeyInterceptor = Interceptor { chain ->
         val original = chain.request()
         val newURL = original.url.newBuilder()
@@ -58,7 +56,7 @@ class WeatherRepository {
             .build()
     }
 
-    private val api: WeatherApi by lazy {
+    val api: WeatherApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okhttp)
@@ -66,19 +64,4 @@ class WeatherRepository {
             .build()
             .create(WeatherApi::class.java)
     }
-
-    suspend fun getWeather(cityName: String): City = api.getWeather(cityName)
-
-    /*suspend fun getWeather(cityName: String): City? {
-            return try {
-            api.getWeather(cityName)
-            } catch (e: Exception) {
-                return null
-            }
-        }*/
-
-    suspend fun getWeatherNearLocation(coordinates: Coord): List<City> =
-        api.getWeatherNearLocation(coordinates.lat.toString(), coordinates.lon.toString()).list
-
-    suspend fun getWeather(cityId: Int): City = api.getWeather(cityId)
 }

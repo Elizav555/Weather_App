@@ -1,4 +1,4 @@
-package com.example.weatherApp.fragments
+package com.example.weatherApp.presentation.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -10,23 +10,27 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.api.load
 import com.example.weatherApp.R
-import com.example.weatherApp.data.WeatherRepository
-import com.example.weatherApp.data.response.City
+import com.example.weatherApp.data.WeatherRepositoryImpl
+import com.example.weatherApp.data.mapper.CityMapper
 import com.example.weatherApp.databinding.FragmentCityBinding
-import com.example.weatherApp.utils.ColorManager
-import com.example.weatherApp.utils.DirectionManager
+import com.example.weatherApp.di.DIContainer
+import com.example.weatherApp.domain.entities.CityWeather
+import com.example.weatherApp.domain.usecase.GetWeatherUseCase
+import com.example.weatherApp.domain.utils.ColorManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
+    private lateinit var getWeatherUseCase: GetWeatherUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        initObjects()
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
@@ -34,23 +38,23 @@ class CityFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            val city = WeatherRepository().getWeather(args.cityId)
+            val city = getWeatherUseCase(args.cityId)
             bindWeatherInfo(city)
         }
     }
 
-    private fun bindWeatherInfo(city: City) {
+    private fun bindWeatherInfo(city: CityWeather) {
         with(binding) {
             curtempTv.setTextColor(
                 ColorManager().chooseTempColor(
-                    city.main.temp,
+                    city.temp,
                     requireContext()
                 )
             )
-            curtempTv.text = getString(R.string.temp, city.main.temp.roundToInt())
+            curtempTv.text = getString(R.string.temp, city.temp)
             cityNameTv.text = city.name
 
-            val iconUri = getString(R.string.weather_icon, city.weather[0].icon)
+            val iconUri = getString(R.string.weather_icon, city.weatherIcon)
             weatherIv.load(iconUri) {
                 error(R.drawable.weather)
                 listener(
@@ -61,25 +65,34 @@ class CityFragment : Fragment() {
                     },
                 )
             }
-            val desc = city.weather[0].description.replaceFirstChar { it.uppercase() }
-            descTv.text = desc
 
-            val windDirection = DirectionManager().degreesToDirection(city.wind.deg)
+            descTv.text = city.weatherDesc
+
             windTv.text =
-                getString(R.string.wind, windDirection, "%.1f".format(city.wind.speed))
+                getString(R.string.wind, city.windDir, city.windSpeed)
 
             feelsLikeTv.setTextColor(
                 ColorManager().chooseTempColor(
-                    city.main.feels_like,
+                    city.feelsLikeTemp,
                     requireContext()
                 )
             )
-            feelsLikeTv.text = getString(R.string.feels_temp, city.main.feels_like.roundToInt())
-            humidityTv.text = getString(R.string.humidity, city.main.humidity)
-            pressureTv.text = getString(R.string.pressure, city.main.pressure)
+            feelsLikeTv.text = getString(R.string.feels_temp, city.feelsLikeTemp)
+            humidityTv.text = getString(R.string.humidity, city.humidity)
+            pressureTv.text = getString(R.string.pressure, city.pressure)
 
             progressBar.visibility = View.GONE
             cityFields.visibility = View.VISIBLE
         }
+    }
+
+    private fun initObjects() {
+        getWeatherUseCase = GetWeatherUseCase(
+            weatherRepository = WeatherRepositoryImpl(
+                api = DIContainer().api,
+                cityMapper = CityMapper(),
+            ),
+            dispatcher = Dispatchers.Default
+        )
     }
 }
