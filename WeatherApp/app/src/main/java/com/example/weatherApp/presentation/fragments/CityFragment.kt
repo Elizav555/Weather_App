@@ -67,10 +67,7 @@ class CityFragment : Fragment() {
             }
 
             descTv.text = city.weatherDesc
-
-            windTv.text =
-                getString(R.string.wind, city.windDir, city.windSpeed)
-
+            windTv.text = getString(R.string.wind, city.windDir, city.windSpeed)
             feelsLikeTv.setTextColor(
                 ColorManager().chooseTempColor(
                     city.feelsLikeTemp,
