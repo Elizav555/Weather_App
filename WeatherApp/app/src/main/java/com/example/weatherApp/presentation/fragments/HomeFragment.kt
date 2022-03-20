@@ -21,7 +21,7 @@ import com.example.weatherApp.databinding.FragmentHomeBinding
 import com.example.weatherApp.di.DIContainer
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
-import com.example.weatherApp.presentation.HomeViewModel
+import com.example.weatherApp.presentation.viewModels.HomeViewModel
 import com.example.weatherApp.presentation.city.CityAdapter
 import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.utils.autoCleared

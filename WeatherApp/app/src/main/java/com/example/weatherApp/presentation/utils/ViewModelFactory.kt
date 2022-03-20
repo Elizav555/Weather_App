@@ -3,8 +3,8 @@ package com.example.weatherApp.presentation.utils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherApp.di.DIContainer
-import com.example.weatherApp.presentation.CityViewModel
-import com.example.weatherApp.presentation.HomeViewModel
+import com.example.weatherApp.presentation.viewModels.CityViewModel
+import com.example.weatherApp.presentation.viewModels.HomeViewModel
 
 class ViewModelFactory(
     private val di: DIContainer,

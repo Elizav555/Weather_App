@@ -23,7 +23,7 @@ class CityHolder(
     fun bind(city: CityWeather) {
         with(binding) {
             val res: Resources = context.resources
-            val color = ColorManager().chooseTempColor(city.temp, context)
+            val color = ColorManager(context).chooseTempColor(city.temp)
             tempTv.setTextColor(color)
             tempTv.text = res.getString(R.string.temp, city.temp)
             cityTv.text = city.name

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.core.content.ContextCompat.getColor
 import com.example.weatherApp.R
 
-class ColorManager {
-    fun chooseTempColor(temp: Int, context: Context): Int {
+class ColorManager(private val context: Context) {
+    fun chooseTempColor(temp: Int): Int {
         return when (temp) {
             in Int.MIN_VALUE..-15 -> getColor(context, R.color.very_cold)
             in -14..0 -> getColor(context, R.color.cold)
