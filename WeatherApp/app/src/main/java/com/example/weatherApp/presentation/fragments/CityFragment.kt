@@ -6,24 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import coil.api.load
 import com.example.weatherApp.R
-import com.example.weatherApp.data.WeatherRepositoryImpl
-import com.example.weatherApp.data.mapper.CityMapper
 import com.example.weatherApp.databinding.FragmentCityBinding
 import com.example.weatherApp.di.DIContainer
 import com.example.weatherApp.domain.entities.CityWeather
-import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import com.example.weatherApp.domain.utils.ColorManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.weatherApp.presentation.CityViewModel
+import com.example.weatherApp.presentation.utils.ViewModelFactory
 
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
-    private lateinit var getWeatherUseCase: GetWeatherUseCase
+    private lateinit var viewModel: CityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,16 +28,14 @@ class CityFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         initObjects()
+        initObservers()
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
-            val city = getWeatherUseCase(args.cityId)
-            bindWeatherInfo(city)
-        }
+        viewModel.getWeather(args.cityId)
     }
 
     private fun bindWeatherInfo(city: CityWeather) {
@@ -83,13 +78,22 @@ class CityFragment : Fragment() {
         }
     }
 
+    private fun initObservers() {
+        viewModel.weather.observe(viewLifecycleOwner) { result ->
+            result.fold(onSuccess = {
+                val city = it
+                bindWeatherInfo(city)
+            }, onFailure = {
+                Log.e("asd", it.message.toString())
+            })
+        }
+    }
+
     private fun initObjects() {
-        getWeatherUseCase = GetWeatherUseCase(
-            weatherRepository = WeatherRepositoryImpl(
-                api = DIContainer().api,
-                cityMapper = CityMapper(),
-            ),
-            dispatcher = Dispatchers.Default
-        )
+        val factory = ViewModelFactory(DIContainer)
+        viewModel = ViewModelProvider(
+            viewModelStore,
+            factory
+        )[CityViewModel::class.java]
     }
 }

@@ -2,6 +2,12 @@ package com.example.weatherApp.di
 
 import androidx.viewbinding.BuildConfig
 import com.example.weatherApp.data.WeatherApi
+import com.example.weatherApp.data.WeatherRepositoryImpl
+import com.example.weatherApp.data.mapper.CityMapper
+import com.example.weatherApp.domain.WeatherRepository
+import com.example.weatherApp.domain.usecase.GetWeatherNearUseCase
+import com.example.weatherApp.domain.usecase.GetWeatherUseCase
+import kotlinx.coroutines.Dispatchers
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,7 +20,7 @@ private const val QUERY_API_KEY = "appid"
 private const val UNITS = "metric"
 private const val QUERY_UNITS = "units"
 
-class DIContainer {
+object DIContainer {
     private val apiKeyInterceptor = Interceptor { chain ->
         val original = chain.request()
         val newURL = original.url.newBuilder()
@@ -64,4 +70,19 @@ class DIContainer {
             .build()
             .create(WeatherApi::class.java)
     }
+
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl(
+        api = api,
+        cityMapper = CityMapper()
+    )
+
+    val getWeatherUseCase: GetWeatherUseCase = GetWeatherUseCase(
+        weatherRepository = weatherRepository,
+        dispatcher = Dispatchers.Default
+    )
+
+    val getWeatherNearUseCase: GetWeatherNearUseCase = GetWeatherNearUseCase(
+        weatherRepository = weatherRepository,
+        dispatcher = Dispatchers.Default
+    )
 }
