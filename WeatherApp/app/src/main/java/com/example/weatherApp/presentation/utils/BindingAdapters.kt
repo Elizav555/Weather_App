@@ -8,7 +8,8 @@ import coil.api.load
 import com.example.weatherApp.R
 
 @BindingAdapter("iconUrl")
-fun loadImageForItem(view: ImageView, imageUrl: String) {
+fun loadImageForItem(view: ImageView, imageUrl: String?) {
+    if(imageUrl == null) return
     view.load(imageUrl) {
         error(R.drawable.weather)
         listener(

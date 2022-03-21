@@ -18,7 +18,6 @@ import com.example.weatherApp.presentation.viewModels.CityViewModel
 
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
-    lateinit var dataBinding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
     private lateinit var viewModel: CityViewModel
 
@@ -27,61 +26,23 @@ class CityFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initObjects()
-        initObservers()
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dataBinding = FragmentCityBinding.bind(view)
-        dataBinding.isLoading = true
+        initObjects()
+        initObservers()
+        binding.isLoading = true
         viewModel.getWeather(args.cityId)
     }
 
     private fun bindWeatherInfo(city: CityWeather) {
-        dataBinding.city = city
-        dataBinding.colorManager = ColorManager(requireContext())
-        dataBinding.iconUrl = getString(R.string.weather_icon, city.weatherIcon)
-        dataBinding.isLoading = false
-//            with(binding) {
-//            curtempTv.setTextColor(
-//                ColorManager().chooseTempColor(
-//                    city.temp,
-//                    requireContext()
-//                )
-//            )
-//            curtempTv.text = getString(R.string.temp, city.temp)
-//            cityNameTv.text = city.name
-
-
-//            weatherIv.load(iconUri) {
-//                error(R.drawable.weather)
-//                listener(
-//                    onError = { _: Any?, throwable: Throwable ->
-//                        throwable.message?.let {
-//                            Log.println(Log.ERROR, "coil", it)
-//                        }
-//                    },
-//                )
-//            }
-
-//            descTv.text = city.weatherDesc
-//            windTv.text = getString(R.string.wind, city.windDir, city.windSpeed)
-//            feelsLikeTv.setTextColor(
-//                ColorManager().chooseTempColor(
-//                    city.feelsLikeTemp,
-//                    requireContext()
-//                )
-//            )
-//            feelsLikeTv.text = getString(R.string.feels_temp, city.feelsLikeTemp)
-//            humidityTv.text = getString(R.string.humidity, city.humidity)
-//            pressureTv.text = getString(R.string.pressure, city.pressure)
-//
-//            progressBar.visibility = View.GONE
-//            cityFields.visibility = View.VISIBLE
-//        }
+        binding.city = city
+        binding.colorManager = ColorManager(requireContext())
+        binding.iconUrl = getString(R.string.weather_icon, city.weatherIcon)
+        binding.isLoading = false
     }
 
     private fun initObservers() {
