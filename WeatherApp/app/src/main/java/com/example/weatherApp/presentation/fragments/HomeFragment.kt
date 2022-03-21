@@ -13,21 +13,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionInflater
 import com.example.weatherApp.R
 import com.example.weatherApp.databinding.FragmentHomeBinding
 import com.example.weatherApp.di.DIContainer
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
-import com.example.weatherApp.presentation.viewModels.HomeViewModel
 import com.example.weatherApp.presentation.city.CityAdapter
 import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.utils.autoCleared
+import com.example.weatherApp.presentation.viewModels.HomeViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import retrofit2.HttpException
+
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var binding: FragmentHomeBinding
@@ -53,15 +56,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initObjects()
-        initObservers()
         binding = FragmentHomeBinding.inflate(inflater)
+        sharedElementReturnTransition =
+            TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initObjects()
+        initObservers()
         configureSearch()
+
+        postponeEnterTransition()
+        binding.recyclerView.viewTreeObserver
+            .addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
         binding.progressBar.visibility = View.VISIBLE
         checkLocationPermission()
     }
@@ -101,7 +113,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun init() {
-        val navigateAction = { position: Int -> navigateToCity(cities[position]) }
+        val navigateAction = { transitionView: View, position: Int ->
+            navigateToCity(
+                transitionView,
+                cities[position]
+            )
+        }
         cityAdapter = CityAdapter(navigateAction, cities, requireContext())
         with(binding.recyclerView) {
             adapter = cityAdapter
@@ -114,6 +131,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             addItemDecoration(dividerItemDecoration)
         }
         cityAdapter.submitList(cities)
+    }
+
+    private fun navigateToCity(transitionView: View, city: CityWeather) {
+        val action = HomeFragmentDirections.actionHomeFragmentToCityFragment(city.id)
+        findNavController().navigate(
+            action,
+            FragmentNavigator.Extras.Builder()
+                .addSharedElements(
+                    mapOf(transitionView to transitionView.transitionName)
+                ).build()
+        )
     }
 
     private fun navigateToCity(city: CityWeather) {

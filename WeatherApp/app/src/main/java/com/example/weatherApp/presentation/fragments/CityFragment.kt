@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
+import androidx.transition.TransitionInflater
 import com.example.weatherApp.R
 import com.example.weatherApp.databinding.FragmentCityBinding
 import com.example.weatherApp.di.DIContainer
@@ -34,6 +35,10 @@ class CityFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initObjects()
         initObservers()
+        val transition =
+            TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition = transition
+        binding.executePendingBindings()
         binding.isLoading = true
         viewModel.getWeather(args.cityId)
     }

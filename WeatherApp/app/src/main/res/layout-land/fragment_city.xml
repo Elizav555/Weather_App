@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-
     <data>
 
         <variable
@@ -21,6 +20,7 @@
         <variable
             name="isLoading"
             type="Boolean" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,6 +49,7 @@
 
         <TextView
             android:id="@+id/cityName_tv"
+            style="@style/MaterialAnimations"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -61,6 +62,7 @@
             android:textColor="@color/black"
             android:textSize="34sp"
             android:textStyle="bold"
+            android:transitionName="@{@string/trans(city.id)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -164,7 +166,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="desc_tv,cityName_tv,weather_iv,
-        curtemp_tv,wind_tv,feels_like_tv, humidity_tv, pressure_tv"
+                curtemp_tv,wind_tv,feels_like_tv, humidity_tv, pressure_tv"
             app:goneUnless="@{!isLoading}"
             tools:visibility="visible" />
 
