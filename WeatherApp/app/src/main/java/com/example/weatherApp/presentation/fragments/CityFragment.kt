@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionInflater
 import com.example.weatherApp.R
@@ -13,6 +14,7 @@ import com.example.weatherApp.databinding.FragmentCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.utils.ColorManager
 import com.example.weatherApp.presentation.App
+import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.viewModels.CityViewModel
 import javax.inject.Inject
 
@@ -21,7 +23,8 @@ class CityFragment : Fragment() {
     private val args: CityFragmentArgs by navArgs()
 
     @Inject
-    lateinit var viewModel: CityViewModel
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var cityViewModel: CityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +32,10 @@ class CityFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         App.mainComponent.inject(this)
+        cityViewModel = ViewModelProvider(
+            viewModelStore,
+            viewModelFactory
+        )[CityViewModel::class.java]
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
@@ -41,7 +48,7 @@ class CityFragment : Fragment() {
         sharedElementEnterTransition = transition
         binding.executePendingBindings()
         binding.isLoading = true
-        viewModel.getWeather(args.cityId)
+        cityViewModel.getWeather(args.cityId)
     }
 
     private fun bindWeatherInfo(city: CityWeather) {
@@ -52,7 +59,7 @@ class CityFragment : Fragment() {
     }
 
     private fun initObservers() {
-        viewModel.weather.observe(viewLifecycleOwner) { result ->
+        cityViewModel.weather.observe(viewLifecycleOwner) { result ->
             result.fold(onSuccess = {
                 val city = it
                 bindWeatherInfo(city)

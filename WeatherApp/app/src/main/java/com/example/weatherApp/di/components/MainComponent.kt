@@ -1,5 +1,7 @@
-package com.example.weatherApp.di
+package com.example.weatherApp.di.components
 
+import com.example.weatherApp.di.ActivityScope
+import com.example.weatherApp.di.modules.DomainModule
 import com.example.weatherApp.presentation.MainActivity
 import com.example.weatherApp.presentation.fragments.CityFragment
 import com.example.weatherApp.presentation.fragments.HomeFragment

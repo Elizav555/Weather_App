@@ -1,4 +1,4 @@
-package com.example.weatherApp.di
+package com.example.weatherApp.di.modules
 
 import androidx.viewbinding.BuildConfig
 import com.example.weatherApp.data.WeatherApi

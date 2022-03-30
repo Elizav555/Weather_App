@@ -6,10 +6,11 @@ import com.example.weatherApp.domain.usecase.GetWeatherNearUseCase
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import com.example.weatherApp.presentation.viewModels.CityViewModel
 import com.example.weatherApp.presentation.viewModels.HomeViewModel
+import javax.inject.Inject
 
-class ViewModelFactory(
-    val getWeatherUseCase: GetWeatherUseCase,
-    val getWeatherNearUseCase: GetWeatherNearUseCase,
+class ViewModelFactory @Inject constructor(
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val getWeatherNearUseCase: GetWeatherNearUseCase,
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T =

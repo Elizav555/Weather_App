@@ -12,6 +12,7 @@ import android.widget.SearchView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,9 +24,10 @@ import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
 import com.example.weatherApp.presentation.App
 import com.example.weatherApp.presentation.city.CityAdapter
+import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.utils.autoCleared
 import com.example.weatherApp.presentation.viewModels.HomeViewModel
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.snackbar.Snackbar
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -39,7 +41,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val defaultCoordinates = Coordinates("35.652832", "139.839478")
 
     @Inject
-    lateinit var viewModel: HomeViewModel
+    lateinit var client: FusedLocationProviderClient
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var homeViewModel: HomeViewModel
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -58,6 +64,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         savedInstanceState: Bundle?
     ): View {
         App.mainComponent.inject(this)
+        homeViewModel = ViewModelProvider(
+            viewModelStore,
+            viewModelFactory
+        )[HomeViewModel::class.java]
+
         binding = FragmentHomeBinding.inflate(inflater)
         sharedElementReturnTransition =
             TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
@@ -159,29 +170,28 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            LocationServices.getFusedLocationProviderClient(requireActivity()) //todo provide from dagger
-                .lastLocation.addOnCompleteListener {
-                    if (it.result != null) {
-                        getCitiesForList(
-                            Coordinates(
-                                it.result.latitude.toString(),
-                                it.result.longitude.toString()
-                            )
+            client.lastLocation.addOnCompleteListener {
+                if (it.result != null) {
+                    getCitiesForList(
+                        Coordinates(
+                            it.result.latitude.toString(),
+                            it.result.longitude.toString()
                         )
-                    } else {
-                        getCitiesForList(defaultCoordinates)
-                        showSnackbar("Error while getting your location, set default")
-                    }
+                    )
+                } else {
+                    getCitiesForList(defaultCoordinates)
+                    showSnackbar("Error while getting your location, set default")
                 }
+            }
         }
     }
 
     private fun getCitiesForList(coordinates: Coordinates) {
-        viewModel.getNearWeather(coordinates)
+        homeViewModel.getNearWeather(coordinates)
     }
 
     private fun getCity(cityName: String) {
-        viewModel.getWeather(cityName)
+        homeViewModel.getWeather(cityName)
     }
 
     private fun configureSearch() {
@@ -205,7 +215,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initObservers() {
-        viewModel.weather.observe(viewLifecycleOwner) { result ->
+        homeViewModel.weather.observe(viewLifecycleOwner) { result ->
             result.fold(onSuccess = {
                 val city = it
                 navigateToCity(city)
@@ -216,7 +226,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             })
         }
 
-        viewModel.weatherList.observe(viewLifecycleOwner) { result ->
+        homeViewModel.weatherList.observe(viewLifecycleOwner) { result ->
             result.fold(onSuccess = {
                 cities = it
                 init()

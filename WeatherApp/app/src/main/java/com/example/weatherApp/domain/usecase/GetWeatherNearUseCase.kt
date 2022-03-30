@@ -5,8 +5,9 @@ import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class GetWeatherNearUseCase(
+class GetWeatherNearUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val dispatcher: CoroutineDispatcher,
 ) {
