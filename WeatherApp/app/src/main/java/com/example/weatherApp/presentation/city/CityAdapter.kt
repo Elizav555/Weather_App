@@ -1,6 +1,5 @@
 package com.example.weatherApp.presentation.city
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import com.example.weatherApp.domain.entities.CityWeather
 class CityAdapter(
     private val action: (transitionView: View, position: Int) -> Unit,
     private val cities: List<CityWeather>,
-    private val context: Context,
 ) :
     ListAdapter<CityWeather, CityHolder>(CityDiffItemCallback()) {
 
@@ -24,7 +22,6 @@ class CityAdapter(
             parent,
             false
         ),
-        context,
         action
     )
 
