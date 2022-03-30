@@ -11,17 +11,14 @@ import com.example.weatherApp.presentation.App
 
 class CityHolder(
     private val binding: ItemCityBinding,
-    action: (transitionView: View, position: Int) -> Unit,
+    private val action: (transitionView: View, cityId: Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
-
-    init {
-        itemView.setOnClickListener {
-            action.invoke(binding.cityNameTv, adapterPosition)
-        }
-    }
 
     fun bind(city: CityWeather) {
         with(binding) {
+            root.setOnClickListener {
+                action.invoke(binding.cityNameTv, city.id)
+            }
             val res: Resources = App.appComponent.getContext().resources
             val color = ColorManager().chooseTempColor(city.temp)
             tempTv.setTextColor(color)

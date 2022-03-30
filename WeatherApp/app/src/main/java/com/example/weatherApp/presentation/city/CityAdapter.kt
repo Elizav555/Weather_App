@@ -8,7 +8,7 @@ import com.example.weatherApp.databinding.ItemCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 
 class CityAdapter(
-    private val action: (transitionView: View, position: Int) -> Unit,
+    private val action: (transitionView: View, cityId: Int) -> Unit,
     private val cities: List<CityWeather>,
 ) :
     ListAdapter<CityWeather, CityHolder>(CityDiffItemCallback()) {

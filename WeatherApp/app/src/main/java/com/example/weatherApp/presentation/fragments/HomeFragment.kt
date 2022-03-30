@@ -125,10 +125,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun init() {
-        val navigateAction = { transitionView: View, position: Int ->
+        val navigateAction = { transitionView: View, cityId: Int ->
             navigateToCity(
                 transitionView,
-                cities[position]
+                cityId
             )
         }
         cityAdapter = CityAdapter(navigateAction, cities)
@@ -145,8 +145,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         cityAdapter.submitList(cities)
     }
 
-    private fun navigateToCity(transitionView: View, city: CityWeather) {
-        val action = HomeFragmentDirections.actionHomeFragmentToCityFragment(city.id)
+    private fun navigateToCity(transitionView: View, cityId: Int) {
+        val action = HomeFragmentDirections.actionHomeFragmentToCityFragment(cityId)
         findNavController().navigate(
             action,
             FragmentNavigator.Extras.Builder()
