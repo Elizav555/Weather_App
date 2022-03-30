@@ -30,7 +30,7 @@
         tools:context=".presentation.fragments.CityFragment">
 
         <TextView
-            android:id="@+id/desc_tv"
+            android:id="@+id/tv_desc"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -43,12 +43,12 @@
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="normal|bold"
-            app:layout_constraintStart_toEndOf="@+id/weather_iv"
-            app:layout_constraintTop_toTopOf="@+id/weather_iv" />
+            app:layout_constraintStart_toEndOf="@+id/iv_weather"
+            app:layout_constraintTop_toTopOf="@+id/iv_weather" />
 
 
         <TextView
-            android:id="@+id/cityName_tv"
+            android:id="@+id/tv_cityName"
             style="@style/MaterialAnimations"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/curtemp_tv"
+            android:id="@+id/tv_curtemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -81,11 +81,11 @@
             android:textColor="@{colorManager.chooseTempColor(city.temp)}"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/weather_iv"
-            app:layout_constraintTop_toBottomOf="@+id/desc_tv" />
+            app:layout_constraintStart_toEndOf="@+id/iv_weather"
+            app:layout_constraintTop_toBottomOf="@+id/tv_desc" />
 
         <TextView
-            android:id="@+id/feels_like_tv"
+            android:id="@+id/tv_feels_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
@@ -98,10 +98,10 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/weather_iv" />
+            app:layout_constraintTop_toBottomOf="@+id/iv_weather" />
 
         <TextView
-            android:id="@+id/wind_tv"
+            android:id="@+id/tv_wind"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -114,10 +114,10 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/feels_like_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_feels_like" />
 
         <TextView
-            android:id="@+id/humidity_tv"
+            android:id="@+id/tv_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -130,10 +130,10 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/pressure_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_pressure" />
 
         <TextView
-            android:id="@+id/pressure_tv"
+            android:id="@+id/tv_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -146,7 +146,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/wind_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_wind" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -166,8 +166,8 @@
             android:id="@+id/city_fields"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="desc_tv,cityName_tv,weather_iv,
-                curtemp_tv,wind_tv,feels_like_tv, humidity_tv, pressure_tv"
+            app:constraint_referenced_ids="tv_desc,tv_cityName,iv_weather,
+                tv_curtemp,tv_wind,tv_feels_like, tv_humidity, tv_pressure"
             app:goneUnless="@{!isLoading}" />
 
         <androidx.constraintlayout.widget.Guideline
@@ -178,13 +178,13 @@
             app:layout_constraintGuide_begin="40dp" />
 
         <ImageView
-            android:id="@+id/weather_iv"
+            android:id="@+id/iv_weather"
             android:layout_width="132dp"
             android:layout_height="132dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
             app:iconUrl="@{iconUrl}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityName_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_cityName" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -17,13 +17,13 @@ class CityHolder(
     fun bind(city: CityWeather) {
         with(binding) {
             root.setOnClickListener {
-                action.invoke(binding.cityNameTv, city.id)
+                action.invoke(binding.tvCityName, city.id)
             }
             val res: Resources = App.appComponent.getContext().resources
             val color = ColorManager().chooseTempColor(city.temp)
-            tempTv.setTextColor(color)
-            tempTv.text = res.getString(R.string.temp, city.temp)
-            cityNameTv.text = city.name
+            tvTemp.setTextColor(color)
+            tvTemp.text = res.getString(R.string.temp, city.temp)
+            tvCityName.text = city.name
             this.city = city
             this.executePendingBindings()
         }
