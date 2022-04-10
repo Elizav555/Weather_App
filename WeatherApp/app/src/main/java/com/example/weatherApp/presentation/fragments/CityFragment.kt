@@ -14,6 +14,7 @@ import com.example.weatherApp.databinding.FragmentCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.utils.ColorManager
 import com.example.weatherApp.presentation.viewModels.CityViewModel
+import com.example.weatherApp.presentation.viewModels.CityViewModelAssistedFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -21,7 +22,13 @@ import javax.inject.Inject
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
-    private val cityViewModel: CityViewModel by viewModels()
+
+    @Inject
+    lateinit var assistedFactory: CityViewModelAssistedFactory
+
+    private val cityViewModel: CityViewModel by viewModels {
+        CityViewModel.Factory(assistedFactory, args.cityId)
+    }
 
     @Inject
     lateinit var colorManager: ColorManager
@@ -42,7 +49,7 @@ class CityFragment : Fragment() {
         sharedElementEnterTransition = transition
         binding.executePendingBindings()
         binding.isLoading = true
-        cityViewModel.getWeather(args.cityId)
+        cityViewModel.getWeather()
     }
 
     private fun bindWeatherInfo(city: CityWeather) {

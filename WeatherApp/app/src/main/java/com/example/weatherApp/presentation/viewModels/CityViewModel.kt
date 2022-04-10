@@ -1,24 +1,21 @@
 package com.example.weatherApp.presentation.viewModels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CityViewModel @Inject constructor(
+class CityViewModel @AssistedInject constructor(
+    @Assisted private val cityId: Int,
     private var getWeatherUseCase: GetWeatherUseCase
 ) : ViewModel() {
 
     private var _weather: MutableLiveData<Result<CityWeather>> = MutableLiveData()
     val weather: LiveData<Result<CityWeather>> = _weather
 
-    fun getWeather(cityId: Int) {
+    fun getWeather() {
         viewModelScope.launch {
             try {
                 val weather = getWeatherUseCase(cityId)
@@ -26,6 +23,15 @@ class CityViewModel @Inject constructor(
             } catch (ex: Exception) {
                 _weather.value = Result.failure(ex)
             }
+        }
+    }
+
+    class Factory(
+        private val assistedFactory: CityViewModelAssistedFactory,
+        private val id: Int,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return assistedFactory.create(id) as T
         }
     }
 }
