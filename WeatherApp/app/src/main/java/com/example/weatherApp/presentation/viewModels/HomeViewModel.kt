@@ -8,9 +8,11 @@ import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
 import com.example.weatherApp.domain.usecase.GetWeatherNearUseCase
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class HomeViewModel @Inject constructor(
     private var getWeatherUseCase: GetWeatherUseCase,
     private var getWeatherNearUseCase: GetWeatherNearUseCase

@@ -4,22 +4,24 @@ import androidx.viewbinding.BuildConfig
 import com.example.weatherApp.data.WeatherApi
 import com.example.weatherApp.data.WeatherRepositoryImpl
 import com.example.weatherApp.data.mapper.CityMapper
+import com.example.weatherApp.di.ApiIntercept
+import com.example.weatherApp.di.MetricsIntercept
 import com.example.weatherApp.domain.WeatherRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 class DataModule {
 
     @Provides
-    @Singleton
     fun provideWeatherRepository(
         api: WeatherApi,
         cityMapper: CityMapper
@@ -31,12 +33,10 @@ class DataModule {
     }
 
     @Provides
-    @Singleton
     fun provideWeatherApi(retrofit: Retrofit): WeatherApi = retrofit
         .create(WeatherApi::class.java)
 
     @Provides
-    @Singleton
     fun provideRetrofit(
         okhttp: OkHttpClient,
         converterFactory: GsonConverterFactory,
@@ -47,8 +47,7 @@ class DataModule {
         .build()
 
     @Provides
-    @Singleton
-    @Named(TAG_APIKEY)
+    @ApiIntercept
     fun provideApiKeyInterceptor() = Interceptor { chain ->
         val original = chain.request()
         val newURL = original.url.newBuilder()
@@ -63,8 +62,7 @@ class DataModule {
     }
 
     @Provides
-    @Singleton
-    @Named(TAG_METRICS)
+    @MetricsIntercept
     fun provideMetricsInterceptor() = Interceptor { chain ->
         val original = chain.request()
         val newURL = original.url.newBuilder()
@@ -78,10 +76,9 @@ class DataModule {
     }
 
     @Provides
-    @Singleton
     fun provideClient(
-        @Named(TAG_APIKEY) apiKeyInterceptor: Interceptor,
-        @Named(TAG_METRICS) metricsInterceptor: Interceptor
+        @ApiIntercept apiKeyInterceptor: Interceptor,
+        @MetricsIntercept metricsInterceptor: Interceptor
     ) = OkHttpClient.Builder()
         .addInterceptor(apiKeyInterceptor)
         .addInterceptor(metricsInterceptor)
@@ -96,11 +93,9 @@ class DataModule {
         .build()
 
     @Provides
-    @Singleton
     fun provideConvertFactory(): GsonConverterFactory = GsonConverterFactory.create()
 
     @Provides
-    @Singleton
     fun provideCityMapper(): CityMapper = CityMapper()
 
     companion object {
@@ -109,8 +104,5 @@ class DataModule {
         private const val QUERY_API_KEY = "appid"
         private const val UNITS = "metric"
         private const val QUERY_UNITS = "units"
-
-        private const val TAG_METRICS = "Metrics"
-        private const val TAG_APIKEY = "Api key"
     }
 }

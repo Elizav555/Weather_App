@@ -12,7 +12,7 @@ import android.widget.SearchView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -22,17 +22,17 @@ import com.example.weatherApp.R
 import com.example.weatherApp.databinding.FragmentHomeBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
-import com.example.weatherApp.presentation.App
+import com.example.weatherApp.domain.utils.ColorManager
 import com.example.weatherApp.presentation.city.CityAdapter
-import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.utils.autoCleared
 import com.example.weatherApp.presentation.viewModels.HomeViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
 import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var binding: FragmentHomeBinding
     private var rationaleDialog: AlertDialog? = null
@@ -41,11 +41,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val defaultCoordinates = Coordinates("35.652832", "139.839478")
 
     @Inject
-    lateinit var client: FusedLocationProviderClient
+    lateinit var colorManager: ColorManager
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private lateinit var homeViewModel: HomeViewModel
+    lateinit var client: FusedLocationProviderClient
+    private val homeViewModel: HomeViewModel by viewModels()
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -63,12 +63,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        App.mainComponent.inject(this)
-        homeViewModel = ViewModelProvider(
-            viewModelStore,
-            viewModelFactory
-        )[HomeViewModel::class.java]
-
         binding = FragmentHomeBinding.inflate(inflater)
         sharedElementReturnTransition =
             TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
@@ -131,7 +125,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 cityId
             )
         }
-        cityAdapter = CityAdapter(navigateAction, cities)
+        cityAdapter = CityAdapter(navigateAction, cities, colorManager)
         with(binding.recyclerView) {
             adapter = cityAdapter
             layoutManager = LinearLayoutManager(requireContext())

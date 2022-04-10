@@ -6,36 +6,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionInflater
 import com.example.weatherApp.R
 import com.example.weatherApp.databinding.FragmentCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.utils.ColorManager
-import com.example.weatherApp.presentation.App
-import com.example.weatherApp.presentation.utils.ViewModelFactory
 import com.example.weatherApp.presentation.viewModels.CityViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
+    private val cityViewModel: CityViewModel by viewModels()
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private lateinit var cityViewModel: CityViewModel
-
+    lateinit var colorManager: ColorManager
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        App.mainComponent.inject(this)
-        cityViewModel = ViewModelProvider(
-            viewModelStore,
-            viewModelFactory
-        )[CityViewModel::class.java]
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
@@ -53,7 +47,7 @@ class CityFragment : Fragment() {
 
     private fun bindWeatherInfo(city: CityWeather) {
         binding.city = city
-        binding.colorManager = ColorManager()
+        binding.colorManager = colorManager
         binding.iconUrl = getString(R.string.weather_icon, city.weatherIcon)
         binding.isLoading = false
     }
