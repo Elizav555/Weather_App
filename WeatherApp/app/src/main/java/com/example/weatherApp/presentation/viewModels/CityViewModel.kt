@@ -5,18 +5,20 @@ import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
 class CityViewModel @AssistedInject constructor(
     @Assisted private val cityId: Int,
-    private var getWeatherUseCase: GetWeatherUseCase
+    private var getWeatherUseCase: GetWeatherUseCase,
+    private var dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private var _weather: MutableLiveData<Result<CityWeather>> = MutableLiveData()
     val weather: LiveData<Result<CityWeather>> = _weather
 
     fun getWeather() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             try {
                 val weather = getWeatherUseCase(cityId)
                 _weather.value = Result.success(weather)
