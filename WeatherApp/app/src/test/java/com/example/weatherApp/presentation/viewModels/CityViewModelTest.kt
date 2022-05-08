@@ -1,8 +1,6 @@
 package com.example.weatherApp.presentation.viewModels
 
 
-import androidx.arch.core.executor.ArchTaskExecutor
-import androidx.arch.core.executor.TaskExecutor
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import com.example.weatherApp.utils.MainCoroutineRule
@@ -18,12 +16,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.AfterEachCallback
-import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.ExtensionContext
 
-@ExtendWith(InstantExecutorExtension::class, MockKExtension::class)
+@ExtendWith(MockKExtension::class)
 internal class CityViewModelTest {
     private val cityId = 1
 
@@ -38,7 +33,7 @@ internal class CityViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setUp() {
-        cityViewModel = CityViewModel(cityId, getWeatherUseCase, dispatcher)
+        cityViewModel = CityViewModel(cityId, getWeatherUseCase)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -61,23 +56,4 @@ internal class CityViewModelTest {
     @Test
     fun getWeatherException() {
     }
-}
-
-class InstantExecutorExtension : BeforeEachCallback, AfterEachCallback {
-
-    override fun beforeEach(context: ExtensionContext?) {
-        ArchTaskExecutor.getInstance()
-            .setDelegate(object : TaskExecutor() {
-                override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
-
-                override fun postToMainThread(runnable: Runnable) = runnable.run()
-
-                override fun isMainThread(): Boolean = true
-            })
-    }
-
-    override fun afterEach(context: ExtensionContext?) {
-        ArchTaskExecutor.getInstance().setDelegate(null)
-    }
-
 }

@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private var getWeatherUseCase: GetWeatherUseCase,
-    private var getWeatherNearUseCase: GetWeatherNearUseCase
+    private var getWeatherNearUseCase: GetWeatherNearUseCase,
 ) : ViewModel() {
 
     private var _weather: MutableLiveData<Result<CityWeather>> = MutableLiveData()
