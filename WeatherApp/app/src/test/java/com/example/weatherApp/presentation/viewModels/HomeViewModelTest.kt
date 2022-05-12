@@ -4,7 +4,7 @@ import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.entities.Coordinates
 import com.example.weatherApp.domain.usecase.GetWeatherNearUseCase
 import com.example.weatherApp.domain.usecase.GetWeatherUseCase
-import com.example.weatherApp.utils.MainCoroutineRule
+import com.example.weatherApp.utils.InstantExecutorExtension
 import getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.every
@@ -12,21 +12,23 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
+import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(MockKExtension::class)
+@ExtendWith(MockKExtension::class, InstantExecutorExtension::class)
 internal class HomeViewModelTest {
     private val cityName = "City"
     private val coordinates = Coordinates("1", "1")
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @get:Rule
-    val dispatcher = MainCoroutineRule().testDispatcher
+//
+//    @get:Rule
+//    val dispatcher = MainCoroutineRule() почему тут так не работает? из-за junit5?
 
     @MockK
     lateinit var getWeatherUseCase: GetWeatherUseCase
@@ -35,15 +37,13 @@ internal class HomeViewModelTest {
     lateinit var getWeatherNearUseCase: GetWeatherNearUseCase
     private lateinit var homeViewModel: HomeViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setUp() {
         homeViewModel = HomeViewModel(getWeatherUseCase, getWeatherNearUseCase)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun getWeatherByName() {
+    fun getWeatherByName() = runTest {
         val expectedCityName = "City"
         val expectedCityId = 1
         val expectedCityTemp = 10
@@ -54,18 +54,23 @@ internal class HomeViewModelTest {
 
         }
         coEvery { getWeatherUseCase(cityName) } returns mockWeather
-        runTest(dispatcher) {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        try {
             homeViewModel.getWeather(cityName)
             assertEquals(
                 Result.success(mockWeather),
                 homeViewModel.weather.getOrAwaitValue()
             )
+        } finally {
+            Dispatchers.resetMain()
         }
     }
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun getNearWeather() = runTest(dispatcher) {
+    fun getNearWeather() = runTest {
         val expectedCityName = "City"
         val expectedCityId = 1
         val expectedCityTemp = 10
@@ -76,10 +81,16 @@ internal class HomeViewModelTest {
 
         }
         coEvery { getWeatherNearUseCase(coordinates) } returns listOf(mockWeather)
-        homeViewModel.getNearWeather(coordinates)
-        assertEquals(
-            Result.success(listOf(mockWeather)),
-            homeViewModel.weather.getOrAwaitValue()
-        )
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        try {
+            homeViewModel.getNearWeather(coordinates)
+            assertEquals(
+                Result.success(listOf(mockWeather)),
+                homeViewModel.weatherList.getOrAwaitValue()
+            )
+        } finally {
+            Dispatchers.resetMain()
+        }
     }
 }
