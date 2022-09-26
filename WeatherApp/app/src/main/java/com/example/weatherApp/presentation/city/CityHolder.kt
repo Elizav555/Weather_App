@@ -7,11 +7,11 @@ import com.example.weatherApp.R
 import com.example.weatherApp.databinding.ItemCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.utils.ColorManager
-import com.example.weatherApp.presentation.App
 
 class CityHolder(
     private val binding: ItemCityBinding,
     private val action: (transitionView: View, cityId: Int) -> Unit,
+    private val colorManager: ColorManager
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(city: CityWeather) {
@@ -19,8 +19,8 @@ class CityHolder(
             root.setOnClickListener {
                 action.invoke(binding.tvCityName, city.id)
             }
-            val res: Resources = App.appComponent.getContext().resources
-            val color = ColorManager().chooseTempColor(city.temp)
+            val res: Resources = root.context.resources
+            val color = colorManager.chooseTempColor(city.temp)
             tvTemp.setTextColor(color)
             tvTemp.text = res.getString(R.string.temp, city.temp)
             tvCityName.text = city.name

@@ -3,10 +3,11 @@ package com.example.weatherApp.presentation
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.weatherApp.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.mainComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
