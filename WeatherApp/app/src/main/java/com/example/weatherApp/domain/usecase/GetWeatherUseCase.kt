@@ -3,12 +3,12 @@ package com.example.weatherApp.domain.usecase
 import com.example.weatherApp.domain.WeatherRepository
 import com.example.weatherApp.domain.entities.CityWeather
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class GetWeatherUseCase(
+class GetWeatherUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
+    private val dispatcher: CoroutineDispatcher,
 ) {
 
     suspend operator fun invoke(cityName: String): CityWeather {

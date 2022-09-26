@@ -1,16 +1,15 @@
 package com.example.weatherApp.presentation.city
 
-import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.weatherApp.databinding.ItemCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 
 class CityAdapter(
-    private val action: (position: Int) -> Unit,
+    private val action: (transitionView: View, cityId: Int) -> Unit,
     private val cities: List<CityWeather>,
-    private val context: Context,
 ) :
     ListAdapter<CityWeather, CityHolder>(CityDiffItemCallback()) {
 
@@ -23,7 +22,6 @@ class CityAdapter(
             parent,
             false
         ),
-        context,
         action
     )
 

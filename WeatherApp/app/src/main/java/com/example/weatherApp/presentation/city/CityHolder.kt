@@ -1,32 +1,31 @@
 package com.example.weatherApp.presentation.city
 
-import android.content.Context
 import android.content.res.Resources
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherApp.R
 import com.example.weatherApp.databinding.ItemCityBinding
 import com.example.weatherApp.domain.entities.CityWeather
 import com.example.weatherApp.domain.utils.ColorManager
+import com.example.weatherApp.presentation.App
 
 class CityHolder(
     private val binding: ItemCityBinding,
-    private val context: Context,
-    action: (position: Int) -> Unit,
+    private val action: (transitionView: View, cityId: Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
-
-    init {
-        itemView.setOnClickListener {
-            action(adapterPosition)
-        }
-    }
 
     fun bind(city: CityWeather) {
         with(binding) {
-            val res: Resources = context.resources
-            val color = ColorManager().chooseTempColor(city.temp, context)
-            tempTv.setTextColor(color)
-            tempTv.text = res.getString(R.string.temp, city.temp)
-            cityTv.text = city.name
+            root.setOnClickListener {
+                action.invoke(binding.tvCityName, city.id)
+            }
+            val res: Resources = App.appComponent.getContext().resources
+            val color = ColorManager().chooseTempColor(city.temp)
+            tvTemp.setTextColor(color)
+            tvTemp.text = res.getString(R.string.temp, city.temp)
+            tvCityName.text = city.name
+            this.city = city
+            this.executePendingBindings()
         }
     }
 }

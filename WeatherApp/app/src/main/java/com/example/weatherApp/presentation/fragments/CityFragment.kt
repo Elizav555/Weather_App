@@ -6,90 +6,66 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
-import coil.api.load
+import androidx.transition.TransitionInflater
 import com.example.weatherApp.R
-import com.example.weatherApp.data.WeatherRepositoryImpl
-import com.example.weatherApp.data.mapper.CityMapper
 import com.example.weatherApp.databinding.FragmentCityBinding
-import com.example.weatherApp.di.DIContainer
 import com.example.weatherApp.domain.entities.CityWeather
-import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import com.example.weatherApp.domain.utils.ColorManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.weatherApp.presentation.App
+import com.example.weatherApp.presentation.utils.ViewModelFactory
+import com.example.weatherApp.presentation.viewModels.CityViewModel
+import javax.inject.Inject
 
 class CityFragment : Fragment() {
     private lateinit var binding: FragmentCityBinding
     private val args: CityFragmentArgs by navArgs()
-    private lateinit var getWeatherUseCase: GetWeatherUseCase
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var cityViewModel: CityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initObjects()
+        App.mainComponent.inject(this)
+        cityViewModel = ViewModelProvider(
+            viewModelStore,
+            viewModelFactory
+        )[CityViewModel::class.java]
         binding = FragmentCityBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
-            val city = getWeatherUseCase(args.cityId)
-            bindWeatherInfo(city)
-        }
+        initObservers()
+        val transition =
+            TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition = transition
+        binding.executePendingBindings()
+        binding.isLoading = true
+        cityViewModel.getWeather(args.cityId)
     }
 
     private fun bindWeatherInfo(city: CityWeather) {
-        with(binding) {
-            curtempTv.setTextColor(
-                ColorManager().chooseTempColor(
-                    city.temp,
-                    requireContext()
-                )
-            )
-            curtempTv.text = getString(R.string.temp, city.temp)
-            cityNameTv.text = city.name
-
-            val iconUri = getString(R.string.weather_icon, city.weatherIcon)
-            weatherIv.load(iconUri) {
-                error(R.drawable.weather)
-                listener(
-                    onError = { _: Any?, throwable: Throwable ->
-                        throwable.message?.let {
-                            Log.println(Log.ERROR, "coil", it)
-                        }
-                    },
-                )
-            }
-
-            descTv.text = city.weatherDesc
-            windTv.text = getString(R.string.wind, city.windDir, city.windSpeed)
-            feelsLikeTv.setTextColor(
-                ColorManager().chooseTempColor(
-                    city.feelsLikeTemp,
-                    requireContext()
-                )
-            )
-            feelsLikeTv.text = getString(R.string.feels_temp, city.feelsLikeTemp)
-            humidityTv.text = getString(R.string.humidity, city.humidity)
-            pressureTv.text = getString(R.string.pressure, city.pressure)
-
-            progressBar.visibility = View.GONE
-            cityFields.visibility = View.VISIBLE
-        }
+        binding.city = city
+        binding.colorManager = ColorManager()
+        binding.iconUrl = getString(R.string.weather_icon, city.weatherIcon)
+        binding.isLoading = false
     }
 
-    private fun initObjects() {
-        getWeatherUseCase = GetWeatherUseCase(
-            weatherRepository = WeatherRepositoryImpl(
-                api = DIContainer().api,
-                cityMapper = CityMapper(),
-            ),
-            dispatcher = Dispatchers.Default
-        )
+    private fun initObservers() {
+        cityViewModel.weather.observe(viewLifecycleOwner) { result ->
+            result.fold(onSuccess = {
+                val city = it
+                bindWeatherInfo(city)
+            }, onFailure = {
+                Log.e("asd", it.message.toString())
+            })
+        }
     }
 }
