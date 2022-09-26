@@ -20,6 +20,7 @@
         <variable
             name="isLoading"
             type="Boolean" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +35,6 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="32dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -52,7 +52,7 @@
             style="@style/MaterialAnimations"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="8dp"
             android:foregroundTint="@color/black"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
@@ -88,7 +88,6 @@
             android:id="@+id/feels_like_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -98,7 +97,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/weather_iv" />
+            app:layout_constraintTop_toTopOf="@+id/desc_tv" />
 
         <TextView
             android:id="@+id/wind_tv"
@@ -168,14 +167,15 @@
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="desc_tv,cityName_tv,weather_iv,
                 curtemp_tv,wind_tv,feels_like_tv, humidity_tv, pressure_tv"
-            app:goneUnless="@{!isLoading}" />
+            app:goneUnless="@{!isLoading}"
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="40dp" />
+            app:layout_constraintGuide_begin="440dp" />
 
         <ImageView
             android:id="@+id/weather_iv"

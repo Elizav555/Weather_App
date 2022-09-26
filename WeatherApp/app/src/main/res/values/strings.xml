@@ -8,4 +8,5 @@
     <string name="humidity">Humidity: %1$d<b>%%</b> </string>
     <string name="pressure">Pressure: %1$d hPa</string>
     <string name="weather_icon">https://openweathermap.org/img/wn/%1$s@2x.png</string>
+    <string name="trans">transaction %1$d</string>
 </resources>
