@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -29,8 +30,9 @@ import com.example.weatherApp.presentation.viewModels.HomeViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
+import java.util.Calendar
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -39,6 +41,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var cityAdapter: CityAdapter by autoCleared()
     private var cities = listOf<CityWeather>()
     private val defaultCoordinates = Coordinates("35.652832", "139.839478")
+    private var lastSearchTime: Long = Calendar.getInstance().timeInMillis
 
     @Inject
     lateinit var colorManager: ColorManager
@@ -54,7 +57,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 getLocation()
             } else {
                 getCitiesForList(defaultCoordinates)
-                showSnackbar("No location access, set default")
+                showSnackbar(getString(R.string.no_location_access))
             }
         }
 
@@ -108,13 +111,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun showLocationRationaleDialog() {
         rationaleDialog = AlertDialog.Builder(requireContext())
-            .setMessage("Need access, so we can show cities nearby")
-            .setPositiveButton("Grant access") { _, _ ->
+            .setMessage(getString(R.string.rationale_msg))
+            .setPositiveButton(getString(R.string.grant_access)) { _, _ ->
                 requestPermissionLauncher.launch(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -174,7 +177,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     )
                 } else {
                     getCitiesForList(defaultCoordinates)
-                    showSnackbar("Error while getting your location, set default")
+                    showSnackbar(getString(R.string.error_location))
                 }
             }
         }
@@ -184,15 +187,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         homeViewModel.getNearWeather(coordinates)
     }
 
-    private fun getCity(cityName: String) {
-        homeViewModel.getWeather(cityName)
-    }
+    private suspend fun getCity(cityName: String) = homeViewModel.getWeather(cityName)
+
 
     private fun configureSearch() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                if (validateQuery(query)) {
-                    getCity(query)
+                val actualSearchTime: Long = Calendar.getInstance().timeInMillis
+                if (actualSearchTime > lastSearchTime + 100) {
+                    lastSearchTime = actualSearchTime
+
+                    if (validateQuery(query)) {
+                        lifecycleScope.launch {
+                            getCity(query)?.let { navigateToCity(it) }
+                                ?: showSnackbar(getString(R.string.invalid_city))
+                        }
+                    }
                     return true
                 }
                 return false
@@ -209,17 +219,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initObservers() {
-        homeViewModel.weather.observe(viewLifecycleOwner) { result ->
-            result.fold(onSuccess = {
-                val city = it
-                navigateToCity(city)
-            }, onFailure = {
-                if (it is HttpException)
-                    showSnackbar("Invalid city")
-                Log.e("asd", it.message.toString())
-            })
-        }
-
         homeViewModel.weatherList.observe(viewLifecycleOwner) { result ->
             result.fold(onSuccess = {
                 cities = it

@@ -11,29 +11,21 @@ import com.example.weatherApp.domain.usecase.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private var getWeatherUseCase: GetWeatherUseCase,
     private var getWeatherNearUseCase: GetWeatherNearUseCase,
 ) : ViewModel() {
-
-    private var _weather: MutableLiveData<Result<CityWeather>> = MutableLiveData()
-    val weather: LiveData<Result<CityWeather>> = _weather
-
     private var _weatherList: MutableLiveData<Result<List<CityWeather>>> = MutableLiveData()
     val weatherList: LiveData<Result<List<CityWeather>>> = _weatherList
 
-    fun getWeather(cityName: String) {
-        viewModelScope.launch {
-            try {
-                val weather = getWeatherUseCase(cityName)
-                _weather.value = Result.success(weather)
-            } catch (ex: Exception) {
-                _weather.value = Result.failure(ex)
-            }
-        }
-    }
+    suspend fun getWeather(cityName: String) = runCatching {
+        getWeatherUseCase(cityName)
+    }.getOrNull()
 
     fun getNearWeather(coordinates: Coordinates) {
         viewModelScope.launch {

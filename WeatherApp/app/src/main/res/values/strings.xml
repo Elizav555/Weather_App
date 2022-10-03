@@ -11,4 +11,10 @@
     <string name="trans">transaction %1$d</string>
     <string name="home">Home</string>
     <string name="weather">Weather</string>
+    <string name="no_location_access">No location access, set default</string>
+    <string name="rationale_msg">Need access, so we can show cities nearby</string>
+    <string name="grant_access">Grant access</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_location">Error while getting your location, set default</string>
+    <string name="invalid_city">Invalid City</string>
 </resources>
