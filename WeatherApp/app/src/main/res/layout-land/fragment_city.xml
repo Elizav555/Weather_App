@@ -28,6 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical"
         tools:context=".presentation.fragments.CityFragment">
 
         <TextView
@@ -40,7 +42,6 @@
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="@{city.weatherDesc}"
-            android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="normal|bold"
             app:layout_constraintStart_toEndOf="@+id/iv_weather"
@@ -59,7 +60,6 @@
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="@{city.name}"
-            android:textColor="@color/black"
             android:textSize="34sp"
             android:textStyle="bold"
             android:transitionName="@{@string/trans(city.id)}"
@@ -88,6 +88,7 @@
             android:id="@+id/tv_feels_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -96,22 +97,24 @@
             android:textColor="@{colorManager.chooseTempColor(city.feelsLikeTemp)}"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_wind"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toTopOf="@+id/tv_desc" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_cityName" />
 
         <TextView
             android:id="@+id/tv_wind"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="@{@string/wind(city.windDir, city.windSpeed)}"
-            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_pressure"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/tv_feels_like" />
 
@@ -119,15 +122,15 @@
             android:id="@+id/tv_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="@{@string/humidity(city.humidity)}"
-            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/tv_pressure" />
 
@@ -135,15 +138,14 @@
             android:id="@+id/tv_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:shadowColor="@android:color/darker_gray"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="@{@string/pressure(city.pressure)}"
-            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_humidity"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/tv_wind" />
 
@@ -175,13 +177,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="440dp" />
+            app:layout_constraintGuide_begin="400dp" />
 
         <ImageView
             android:id="@+id/iv_weather"
             android:layout_width="132dp"
             android:layout_height="132dp"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             app:iconUrl="@{iconUrl}"
             app:layout_constraintStart_toStartOf="parent"
