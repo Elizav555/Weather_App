@@ -57,10 +57,10 @@ internal class HomeViewModelTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         Dispatchers.setMain(testDispatcher)
         try {
-            homeViewModel.getWeather(cityName)
+            val actualWeather = homeViewModel.getWeather(cityName)
             assertEquals(
-                Result.success(mockWeather),
-                homeViewModel.weather.getOrAwaitValue()
+                mockWeather,
+                actualWeather
             )
         } finally {
             Dispatchers.resetMain()
