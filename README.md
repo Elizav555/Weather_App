@@ -9,6 +9,7 @@ My first MVVM client-server app
 - Layout for landscape mode
 - Animation
 - Request Permissions
+- Some tests
 
 ## Stack
 - FusedLocationProviderClient
