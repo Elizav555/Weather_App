@@ -1,4 +1,4 @@
-# [Weather App](https://github.com/Elizav555/Weather_App) 
+# [Weather_App](https://github.com/Elizav555/Weather_App) 
 My first MVVM client-server app
 
 ## Features
